@@ -1,33 +1,28 @@
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 
-import javax.swing.JComponent;
-
-public class Cell extends JComponent{
+public class CellObj {
 	private String status;
 	private int neighbors;
 	int x;
 	int y;
 	int height = 20;
 	int width = 20;
-	
-	public Cell(int x, int y, String status){
-		this.x=x;
-		this.y=y;
+
+	public CellObj(int x, int y, String status){
+		this.x=x*25+10;
+		this.y=y*25;
 		this.status=status;
 	}
-	
+
 	public void setStatus(String status){
 		this.status=status;
 	}
 	public String getStatus(){
 		return this.status;
 	}
-	
+
 	public void draw(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		if(status=="alive"){
@@ -36,18 +31,10 @@ public class Cell extends JComponent{
 		else{
 			g2.setColor(Color.BLACK);
 		}
+		g2.setColor(Color.BLUE);
 		g2.fillRect(x, y, width, height);;
-	}
-	
-	@Override
-	public Dimension getPreferredSize() {
-		  return new Dimension(width, height);
-	}
-	@Override
-	public void paintComponent(Graphics g){
-		super.paintComponent(g);
+
 
 	}
-	
-	
+
 }
