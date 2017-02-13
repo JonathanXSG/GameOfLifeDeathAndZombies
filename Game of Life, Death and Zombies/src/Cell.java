@@ -12,7 +12,7 @@ public class Cell {
 
 	public Cell(int x, int y, String status){
 		this.x=x*25+10;
-		this.y=y*25+10;
+		this.y=y*25;
 		this.status=status;
 	}
 

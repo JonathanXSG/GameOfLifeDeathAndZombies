@@ -13,17 +13,13 @@ public class GameBoard extends JPanel{
 	ArrayList<Cell> cells = new ArrayList<Cell>();
 	int xPadding=5;
 	int yPadding=5;
-	
+	CellGrid cellgrid = new CellGrid();
 	public GameBoard() {
 		setBackground(Color.DARK_GRAY);
-        setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        for(int i=1;i<=10;i++){
-			for(int j=1;j<=10;j++){
-				cells.add(new Cell(j,i,"alive"));
-			}
-		}
+		setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        add(cellgrid);
+        cellgrid.setLocation(0,0);
     }
-	
 
     @Override
 	public Dimension getPreferredSize() {
@@ -32,9 +28,6 @@ public class GameBoard extends JPanel{
 	@Override
 	public void paintComponent(Graphics g) {
         super.paintComponent(g);
-       for(Cell i:cells){
-    	   i.draw(g);
-       }
         
     }  
 }

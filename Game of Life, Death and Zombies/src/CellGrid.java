@@ -8,16 +8,20 @@ import java.util.ArrayList;
 import javax.swing.JComponent;
 
 public class CellGrid extends JComponent{
-	
+	private String status;
+	private int neighbors;
 	int x;
 	int y;
-	int height = 10;
-	int width = 10;
+	int height = 500;
+	int width = 500;
 	ArrayList<Cell> cells = new ArrayList<Cell>();
 	
-	public CellGrid(int xPos, int yPos) {
-		this.x=xPos;
-		this.x=yPos;
+	public CellGrid() {
+		for(int i=0;i<10;i++){
+			for(int j=0;j<10;j++){
+				cells.add(new Cell(j,i,"alive"));
+			}
+		}
 	}
 	
 	@Override
@@ -27,13 +31,10 @@ public class CellGrid extends JComponent{
 	@Override
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
-//		for(int i=0;i<=2;i++){
-//			for(int j=0;j<=2;i++){
-//				cells.add(new Cell(j,i,"alive"));
-//			}
-//		}
-		cells.add(new Cell(5,5,"alive"));
-		cells.get(0).draw(g);
+
+		for(Cell i:cells){
+	    	   i.draw(g);
+	       }
 
 	}
 	
