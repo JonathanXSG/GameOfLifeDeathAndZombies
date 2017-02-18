@@ -31,10 +31,12 @@ public class Cell extends JComponent{
             public void mouseClicked(MouseEvent e) {
             	mouseClick(e);
             }});
+		setToolTipText(getXVal()+" "+getYVal());
+		setBounds(x, y, height+10, width);
 	}
 	
 	public void mouseClick(MouseEvent e){
-		this.state= !state;
+		this.state=!this.state;
     	if(e.isControlDown() || SwingUtilities.isRightMouseButton(e)){
     		if(this.status != "zombie"){
     			setStatus("zombie");
@@ -44,24 +46,30 @@ public class Cell extends JComponent{
         			setStatus("alive");
         		}
         		else{
-        			setStatus("daed");
+        			setStatus("dead");
         		}
     		}
     	}
     	else if(SwingUtilities.isLeftMouseButton(e)){
-			System.out.println("hello");
     		if(state==true){
     			setStatus("alive");
     		}
     		else{
-    			setStatus("daed");
+    			setStatus("dead");
     		}
     	}
-        repaint();
+    	
 	}
 	
+	public int getNeighbors(){
+		return neighbors;
+	}
+	public void setNeighbors(int neighbors){
+		this.neighbors=neighbors;
+	}
 	public void setStatus(String status){
 		this.status=status;
+		repaint();
 	}
 	public String getStatus(){
 		return this.status;
@@ -78,7 +86,12 @@ public class Cell extends JComponent{
 		else if(status == "dead"){
 			g2.setColor(Color.BLACK);
 		}
+		else{
+			g2.setColor(Color.RED);
+		}
 		g2.fillRect(0, 0, width, height);;
+		GameBoard.setNeighbors();
+		setToolTipText(getXVal()+" "+getYVal()+"  "+getNeighbors());
 	}
 	
 	@Override
@@ -89,8 +102,14 @@ public class Cell extends JComponent{
 	public void paintComponent(Graphics g){
 		this.draw(g);
 		super.paintComponent(g);
-		
 	}
 	
+	public int getXVal(){
+		return x;
+	}
+	
+	public int getYVal(){
+		return y;
+	}
 	
 }
