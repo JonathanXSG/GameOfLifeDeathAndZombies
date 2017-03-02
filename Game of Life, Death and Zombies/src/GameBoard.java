@@ -1,99 +1,285 @@
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.ComponentOrientation;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Random;
 import javax.swing.*;
 
 public class GameBoard extends JPanel{
-	static ArrayList<Cell> cells = new ArrayList<Cell>();
-	int hGap=1;
-	int vGap=1;
-	int cellsCount;
+	private static final long serialVersionUID = -6141196392003841438L;
+	
+	static int hGap=1;
+	static int vGap=1;
+	static int columns=50;
+	static int rows=50;
+	private Boolean shapeToggle;
+	private String selectedShape = "star";
+	static GridLayout cellGrid = new GridLayout(rows,columns,hGap,vGap);
+	static Cell[][] cellArray = new Cell[200][200];
+	
+	private MouseAdapter mouseClick = new MouseAdapter() {
+		@Override
+		public void mousePressed(MouseEvent e) {
+			System.out.println("hello");
+			if(shapeToggle){
+				insertShape(e);
+			}
+			else{
+				cellSelection(e);
+			}
+		}
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			cellSelection(e);
+		}
+	};
 	
 	public GameBoard() {
 		applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		setLayout(new GridLayout(0,20,hGap,vGap));
+		setLayout(cellGrid);
 		setBackground(Color.DARK_GRAY);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        for(int i=0;i<20;i++){
-			for(int j=0;j<20;j++){
-				cells.add(new Cell(j,i,"dead"));
-				
+		shapeToggle=false;
+		
+		Random random = new Random();
+        for(int i=0;i<rows;i++){
+			for(int j=0;j<columns;j++){
+				cellArray[j][i] = new Cell(j,i,"dead");
+				cellArray[j][i].addMouseListener(mouseClick);
+				add(cellArray[j][i]);
 			}
 		}
-        for(Cell cell1:cells){
-        	add(cell1);
-        	System.out.println(cell1.getXVal() +" " + cell1.getYVal());
-        }
+        insertTestShape();
     }
 	
-	static public void resetBoard(){
-		for(Cell cellIteration:cells){
-			cellIteration.setStatus("dead");
-		}
+	private void cellSelection(MouseEvent e){
+		Cell selectedCell = (Cell) e.getComponent();
+    	if(e.isControlDown() || SwingUtilities.isRightMouseButton(e)){
+    		if(selectedCell.getStatus() != "zombie"){
+    			selectedCell.setStatus("zombie");
+    		}
+    	}
+    	else if(SwingUtilities.isLeftMouseButton(e)){
+    		selectedCell.setState(!selectedCell.getState());
+    		if(selectedCell.getState()==true){
+    			selectedCell.setStatus("alive");
+    		}
+    		else{
+    			selectedCell.setStatus("dead");
+    		}
+    	}
+    	setAdyacentNeighborValues(selectedCell.getXVal(),selectedCell.getYVal());
+    	selectedCell.repaint();
 	}
 	
-	static void runBoard(){
-		setNeighbors();
+	public void resetBoard(){
+		for(int i=0;i<rows;i++){
+			for(int j=0;j<columns;j++){
+				cellArray[i][j].setStatus("dead");
+			}
+		}
+	}
+	public void runBoard(){
+		setAllNeighborValues();
 		checkNeighbors();
+		repaint();
+		setAllNeighborValues();
+		Main.generationCount++;
+		Main.repaintGameboardSettings();
+		System.out.println(Main.generationCount);
 	}
-	
-	public static void setNeighbors(){
-		for(Cell cell1:cells){
-			int n=0;
-			for(Cell cell2:cells){
-				if(cell2.getStatus()=="alive" && cell1!=cell2){
-					if(cell1.getYVal()+1 >= cell2.getYVal() && cell1.getYVal()-1 <= cell2.getYVal() ){
-					int upBound=cell1.getXVal()-1;
-					int lowBound=cell1.getXVal()+1;
-						if(lowBound >= cell2.getXVal() && upBound <= cell2.getXVal() ){
-							n++;
-						}
-					}
-				}
+	public void setAllNeighborValues(){
+		for(int x = 0;x < columns;x++) {
+			for (int y = 0; y < rows; y++) {
+				calcNeighbors(x,y);
 			}
-			cell1.setNeighbors(n);
 		}
 	}
-	
+	public void setAdyacentNeighborValues(int x, int y){
+		int smallX = x - 1;
+		if(smallX < 0) smallX = columns - 1;
+		int smallY = y - 1;
+		if(smallY < 0) smallY = rows - 1;
+		int bigX = (x + 1) % columns;
+		int bigY = (y + 1) % columns;
+		calcNeighbors(smallX,smallY);
+		calcNeighbors(smallX,y);
+		calcNeighbors(smallX,bigY);
+		calcNeighbors(x,smallY);
+		calcNeighbors(x,y);
+		calcNeighbors(x,bigY);
+		calcNeighbors(bigX,smallY);
+		calcNeighbors(bigX,y);
+		calcNeighbors(bigX,bigY);
+	}
+	public void calcNeighbors(int x, int y){
+		int smallX = x - 1;
+		if(smallX < 0) smallX = columns - 1;
+		int smallY = y - 1;
+		if(smallY < 0) smallY = rows - 1;
+		int bigX = (x + 1) % columns;
+		int bigY = (y + 1) % columns;
+		int neighbors = 0;
+		if(cellArray[smallX] [smallY].isAlive()) neighbors++;
+		if(cellArray[smallX] [y].isAlive()) neighbors++;
+		if(cellArray[smallX] [bigY].isAlive()) neighbors++;
+		if(cellArray[x] [smallY].isAlive()) neighbors++;
+		if(cellArray[x] [bigY].isAlive()) neighbors++;
+		if(cellArray[bigX] [smallY].isAlive()) neighbors++;
+		if(cellArray[bigX] [y].isAlive()) neighbors++;
+		if(cellArray[bigX] [bigY].isAlive()) neighbors++;
+		cellArray[x][y].setNeighbors(neighbors);
+		cellArray[x][y].setToolTipText("X: "+x+" , Y: "+y+" , N: "+cellArray[x][y].getNeighbors());
+	}
 	static public void checkNeighbors(){
-		for(Cell cell:cells){
-			if(cell.getStatus()=="alive"){
-				if(cell.getNeighbors()<2){
-					cell.setStatus("dead");
+		for(int i=0;i<columns;i++){
+			for(int j=0;j<rows;j++){
+				if(cellArray[i][j].getNeighbors()<2 || cellArray[i][j].getNeighbors()>3){
+					cellArray[i][j].setStatus("dead");
 				}
-				else if(cell.getNeighbors()==2 || cell.getNeighbors()==3){
-					cell.setStatus("alive");
+				else if(cellArray[i][j].getNeighbors()==2 && cellArray[i][j].getStatus()=="alive"){
+					cellArray[i][j].setStatus("alive");
 				}
-				else if(cell.getNeighbors()>3){
-					cell.setStatus("dead");
-				}
-			}
-			else if(cell.getStatus()=="dead"){
-				if(cell.getNeighbors()==3){
-					cell.setStatus("alive");
+				if(cellArray[i][j].getNeighbors()==3){
+					cellArray[i][j].setStatus("alive");
 				}
 			}
 		}
 	}
 	
-    @Override
-	public Dimension getPreferredSize() {
-		  return new Dimension(500, 500);
+	public void insertTestShape(){
+		int middleX = columns/2;
+		int middleY = rows/2;
+		star(middleX, middleY-3);
+		star(middleX, middleY+3);
+		star(middleX-3, middleY);
+		star(middleX+3, middleY);
+		setAllNeighborValues();
 	}
+	public void insertShape(MouseEvent e){
+		Cell selectedCell = (Cell) e.getComponent();
+		int x = selectedCell.getXVal();
+		int y = selectedCell.getYVal();
+		switch (selectedShape) {
+		case "star":
+			star(x,y);
+			break;
+		case "block":
+			block(x,y);
+			break;
+		case "beehive":
+			beehive(x,y);
+			break;
+		case "loaf":
+			loaf(x,y);
+			break;
+		case "boat":
+			boat(x,y);
+			break;
+		case "tub":
+			tub(x,y);
+			break;
+		case "blinker":
+			blinker(x,y);
+			break;
+		case "toad":
+			toad(x,y);
+			break;
+		case "beacon":
+			beacon(x,y);
+			break;
+		default:
+			break;
+		}
+		setAllNeighborValues();
+		repaint();
+	}
+	
+	private void star(int x, int y){
+		paintCell(x, y-1, "alive");
+		paintCell(x, y, "alive");
+		paintCell(x, y+1, "alive");
+		paintCell(x-1, y, "alive");
+		paintCell(x+1, y, "alive");
+	}
+	private void block(int x, int y){
+		paintCell(x, y, "alive");
+		paintCell(x, y+1, "alive");
+		paintCell(x+1, y, "alive");
+		paintCell(x+1, y+1, "alive");
+	}
+	private void beehive(int x, int y){
+		paintCell(x, y-1, "alive");
+		paintCell(x+1, y-1, "alive");
+		paintCell(x-1, y, "alive");
+		paintCell(x+2, y, "alive");
+		paintCell(x, y+1, "alive");
+		paintCell(x+1, y+1, "alive");
+	}
+	private void loaf(int x, int y){
+		paintCell(x, y-1, "alive");
+		paintCell(x+1, y-1, "alive");
+		paintCell(x-1, y, "alive");
+		paintCell(x+2, y, "alive");
+		paintCell(x, y+1, "alive");
+		paintCell(x+2, y+1, "alive");
+		paintCell(x+1, y+2, "alive");
+	}
+	private void boat(int x, int y){
+		cellArray[x-1][y-1].setStatus("alive");
+		cellArray[x][y-1].setStatus("alive");
+		cellArray[x][y+1].setStatus("alive");
+		cellArray[x-1][y].setStatus("alive");
+		cellArray[x+1][y].setStatus("alive");
+	}
+	private void tub(int x, int y){
+		cellArray[x][y-1].setStatus("alive");
+		cellArray[x][y+1].setStatus("alive");
+		cellArray[x-1][y].setStatus("alive");
+		cellArray[x+1][y].setStatus("alive");
+	}
+	private void blinker(int x, int y){
+		cellArray[x-1][y].setStatus("alive");
+		cellArray[x][y].setStatus("alive");
+		cellArray[x+1][y].setStatus("alive");
+	}
+	private void toad(int x, int y){
+		cellArray[x-1][y].setStatus("alive");
+		cellArray[x][y].setStatus("alive");
+		cellArray[x+1][y].setStatus("alive");
+		cellArray[x][y-1].setStatus("alive");
+		cellArray[x+1][y-1].setStatus("alive");
+		cellArray[x+2][y-1].setStatus("alive");
+	}
+	private void beacon(int x, int y){
+		cellArray[x-1][y-1].setStatus("alive");
+		cellArray[x][y-1].setStatus("alive");
+		cellArray[x-1][y].setStatus("alive");
+		cellArray[x][y].setStatus("alive");
+		cellArray[x+1][y+1].setStatus("alive");
+		cellArray[x+2][y+1].setStatus("alive");
+		cellArray[x+1][y+2].setStatus("alive");
+		cellArray[x+2][y+2].setStatus("alive");
+	}
+	private void paintCell(int x, int y,String status){
+		cellArray[x][y].setStatus(status);
+	}
+	
+	public void setShapeToggle(Boolean state){
+		this.shapeToggle=state;
+	}
+	
+	public void setSelectedShape(String shape){
+		selectedShape = shape;
+	}
+    
 	@Override
 	public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+		super.paintComponent(g);
     }  
+	
 }
