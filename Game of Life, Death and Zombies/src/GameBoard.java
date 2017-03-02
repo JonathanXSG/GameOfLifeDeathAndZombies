@@ -1,11 +1,10 @@
-
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
 
@@ -16,15 +15,16 @@ public class GameBoard extends JPanel{
 	static int vGap=1;
 	static int columns=50;
 	static int rows=50;
+	private Boolean createRandom;
 	private Boolean shapeToggle;
 	private String selectedShape = "star";
 	static GridLayout cellGrid = new GridLayout(rows,columns,hGap,vGap);
 	static Cell[][] cellArray = new Cell[200][200];
+	private String guideStatusOverride;
 	
 	private MouseAdapter mouseClick = new MouseAdapter() {
 		@Override
 		public void mousePressed(MouseEvent e) {
-			System.out.println("hello");
 			if(shapeToggle){
 				insertShape(e);
 			}
@@ -36,6 +36,26 @@ public class GameBoard extends JPanel{
 		public void mouseDragged(MouseEvent e) {
 			cellSelection(e);
 		}
+		@Override
+		public void mouseExited(MouseEvent e) {
+			Cell overCell = (Cell) e.getComponent();
+			if(overCell.getStatus() == "guide"){
+				overCell.setStatus(guideStatusOverride);
+				overCell.repaint();
+		    }
+		}
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			if(SwingUtilities.isLeftMouseButton(e)){
+				cellSelection(e);
+			}
+			else{
+				Cell overCell = (Cell) e.getComponent();
+				guideStatusOverride=overCell.getStatus();
+				overCell.setStatus("guide");
+				overCell.repaint();
+			}
+		}
 	};
 	
 	public GameBoard() {
@@ -43,17 +63,23 @@ public class GameBoard extends JPanel{
 		setLayout(cellGrid);
 		setBackground(Color.DARK_GRAY);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		createRandom=true;
 		shapeToggle=false;
-		
 		Random random = new Random();
+		
         for(int i=0;i<rows;i++){
 			for(int j=0;j<columns;j++){
-				cellArray[j][i] = new Cell(j,i,"dead");
+				if(createRandom && random.nextInt(10)<2){
+					cellArray[j][i] = new Cell(j,i,random.nextBoolean());
+				}
+				else{
+					cellArray[j][i] = new Cell(j,i,"dead");
+				}
 				cellArray[j][i].addMouseListener(mouseClick);
+				cellArray[j][i].addMouseMotionListener(mouseClick);
 				add(cellArray[j][i]);
 			}
 		}
-        insertTestShape();
     }
 	
 	private void cellSelection(MouseEvent e){
@@ -64,8 +90,7 @@ public class GameBoard extends JPanel{
     		}
     	}
     	else if(SwingUtilities.isLeftMouseButton(e)){
-    		selectedCell.setState(!selectedCell.getState());
-    		if(selectedCell.getState()==true){
+    		if(selectedCell.getStatus()=="dead" || selectedCell.getStatus()=="guide"){
     			selectedCell.setStatus("alive");
     		}
     		else{
@@ -280,6 +305,8 @@ public class GameBoard extends JPanel{
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-    }  
+    }
+
+
 	
 }

@@ -55,6 +55,7 @@ public class ControlBoard extends JPanel{
 		setLayout(new BorderLayout());
 
 		resetButton.addActionListener(reset);
+		refreshButton.addActionListener(refresh);
 		nextButton.addActionListener(next);
 		startButton.addActionListener(start);
 		stopButton.addActionListener(stop);
@@ -105,6 +106,7 @@ public class ControlBoard extends JPanel{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Main.repaintGameBoard();
+			repaint();
 		}
 	};
 	private ActionListener start = new ActionListener() {
@@ -138,7 +140,6 @@ public class ControlBoard extends JPanel{
 			JToggleButton toggle = (JToggleButton) e.getSource();
             if (toggle.isSelected()) {
             	Main.setShapeToggle(true);
-            	System.out.println(toggle.isSelected());
             } else {
             	Main.setShapeToggle(false);
             }

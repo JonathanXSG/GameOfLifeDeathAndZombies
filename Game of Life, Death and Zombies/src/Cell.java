@@ -20,49 +20,20 @@ public class Cell extends JComponent{
 		this.y=y;
 		this.status=status;
 		
-//		this.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mousePressed(MouseEvent e) {
-//            	mouseClick(e);
-//            }});
 		setToolTipText("X: "+this.getXVal()+" , Y: "+this.getYVal());
 	}
 	public Cell(int x, int y, Boolean alive){
 		this.x=x;
 		this.y=y;
-		this.setState(state);
+		this.state=alive;
 		if(this.getState()){
 			this.status="alive";
 		}
+		else{
+			this.status="dead";
+		}
 		setToolTipText("X: "+this.getXVal()+" , Y: "+this.getYVal());
 	}
-	
-//	private void mouseClick(MouseEvent e){
-//		this.setState(!this.getState());
-//    	if(e.isControlDown() || SwingUtilities.isRightMouseButton(e)){
-//    		if(this.status != "zombie"){
-//    			setStatus("zombie");
-//    		}
-//    		else if(this.status=="zombie"){
-//    			if(this.getState()==true){
-//        			setStatus("alive");
-//        		}
-//        		else{
-//        			setStatus("dead");
-//        		}
-//    		}
-//    	}
-//    	else if(SwingUtilities.isLeftMouseButton(e)){
-//    		if(getState()==true){
-//    			setStatus("alive");
-//    		}
-//    		else{
-//    			setStatus("dead");
-//    		}
-//    	}
-//    	Main.updateNeightbors(this.getX(),this.getY());
-//		repaint();
-//	}
 	
 	public Boolean isAlive(){
 		return this.getState();
@@ -97,10 +68,14 @@ public class Cell extends JComponent{
 		else if(status == "dead"){
 			g2.setColor(Color.BLACK);
 		}
+		else if(status == "guide"){
+			g2.setColor(Color.GRAY);
+		}
 		else{
 			g2.setColor(Color.RED);
 		}
 		g2.fillRect(0, 0, width, height);;
+		setToolTipText("X: "+this.getXVal()+" , Y: "+this.getYVal() + " , N: " + this.getNeighbors());
 	}
 	
 	@Override
@@ -109,8 +84,8 @@ public class Cell extends JComponent{
 	}
 	@Override
 	public void paintComponent(Graphics g){
-		this.draw(g);
 		super.paintComponent(g);
+		this.draw(g);
 	}
 	public Boolean getState() {
 		return state;
