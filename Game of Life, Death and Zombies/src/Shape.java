@@ -1,33 +1,55 @@
-import java.awt.Point;
+
+import javafx.geometry.Point2D; 
 import java.util.ArrayList;
 
 public class Shape {
 	
-	private static String name;
-	private static ArrayList<Point> points;
-	private static Point centerPoint;
+	private String name;
+	private ArrayList<Point2D> initialPoints = new ArrayList<>();
+	private ArrayList<Point2D> relativePoints = new ArrayList<>();
+	private Point2D initialCenterPoint;
+	private Point2D centerPoint;
 	
 	public Shape(){
+		Point2D p1 = new Point2D(2.0,2.0);
+		Point2D p2 = new Point2D(-2.0,-2.0);
+		this.initialPoints.add(p1);
+		SetCenterPoint();
 		
 	}
 	
-	public static void newShape(String name,ArrayList<Point> points){
-		Point bigX = points.get(0), smallX= points.get(0), bigY= points.get(0), smallY= points.get(0);
-		for(Point point:points){
-			if(point.x > bigX.x)bigX = point;
-			if(point.x < smallX.x)smallX = point;
-			if(point.x > bigY.x)bigY = point;
-			if(point.x < smallY.x)smallY = point;
-			points.add(point);
+	public void SetCenterPoint(){
+		Point2D bigX = this.initialPoints.get(0), smallX= this.initialPoints.get(0), bigY= this.initialPoints.get(0), smallY= this.initialPoints.get(0);
+		for(Point2D point:this.initialPoints){
+			if(point.getX() > bigX.getX())bigX = point;
+			if(point.getX() < smallX.getX())smallX = point;
+			if(point.getY() > bigY.getY())bigY = point;
+			if(point.getY() < smallY.getY())smallY = point;
 		}
-		Point center = null;
-		center.x=bigX.x+smallX.x;
-		center.y=bigY.y+smallY.y;
-		centerPoint = center;
+		Point2D mp1,mp2;
+		mp1 = bigX.midpoint(smallX);
+		mp2 = bigY.midpoint(smallY);
+		Point2D midPoint = mp1.midpoint(mp2);
+		System.out.println(mp1 + "midpoint");
+		initialCenterPoint = new Point2D(Math.floor(midPoint.getX()), Math.floor(midPoint.getY()));
+		
 	}
 	
-	public static ArrayList<Point> star(Point centerPoint){
-		int x =centerPoint.x;
-		return null;
+	public ArrayList<Point2D> setRetalivePoints(){
+		for(Point2D point:this.initialPoints){
+			relativePoints.add(point.subtract(initialCenterPoint));
+			
+			System.out.println(point +""+  initialCenterPoint);
+		}
+		return relativePoints;
 	}
+	
+	public ArrayList<Point2D> star(Point2D centerPoint){
+		return relativePoints;
+	}
+	
+	
+	
+	
+	
 }

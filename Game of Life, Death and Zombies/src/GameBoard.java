@@ -5,8 +5,11 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
+
+import javafx.geometry.Point2D;
 
 public class GameBoard extends JPanel{
 	private static final long serialVersionUID = -6141196392003841438L;
@@ -26,7 +29,8 @@ public class GameBoard extends JPanel{
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if(shapeToggle){
-				insertShape(e);
+				drawShape(e);
+				//insertShape(e);
 			}
 			else{
 				cellSelection(e);
@@ -58,6 +62,21 @@ public class GameBoard extends JPanel{
 		}
 	};
 	
+	public void drawShape(MouseEvent e){
+		Cell overCell = (Cell) e.getComponent();
+		Shape shape = new Shape();
+		Point2D point = new Point2D(overCell.getXVal(), overCell.getYVal());
+		
+		ArrayList<Point2D> relativePoints = shape.setRetalivePoints();
+		for(Point2D point1:relativePoints){
+			System.out.println(point);
+			int x = (int) point.getX();
+			int y = (int) point.getY();
+			cellArray[x][y].setStatus("zombie");
+			cellArray[x][y].repaint();
+;		}
+	}
+	
 	public GameBoard() {
 		applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		setLayout(cellGrid);
@@ -80,6 +99,7 @@ public class GameBoard extends JPanel{
 				add(cellArray[j][i]);
 			}
 		}
+        
     }
 	
 	private void cellSelection(MouseEvent e){
@@ -115,7 +135,6 @@ public class GameBoard extends JPanel{
 		setAllNeighborValues();
 		Main.generationCount++;
 		Main.repaintGameboardSettings();
-		System.out.println(Main.generationCount);
 	}
 	public void setAllNeighborValues(){
 		for(int x = 0;x < columns;x++) {
