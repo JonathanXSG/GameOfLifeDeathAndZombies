@@ -1,26 +1,23 @@
-
-import javafx.geometry.Point2D; 
+import javafx.geometry.Point2D;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Shape {
 	
 	private String name;
-	private ArrayList<Point2D> initialPoints = new ArrayList<>();
-	private ArrayList<Point2D> relativePoints = new ArrayList<>();
-	private Point2D initialCenterPoint;
-	private Point2D centerPoint;
+	private ArrayList<Point2D> centerRelativePoints = new ArrayList<>();
+	private ArrayList<Point2D> clickRelativePoints = new ArrayList<>();
+	private Point2D shapeCenterPoint;
 	
-	public Shape(){
-		Point2D p1 = new Point2D(2.0,2.0);
-		Point2D p2 = new Point2D(-2.0,-2.0);
-		this.initialPoints.add(p1);
-		SetCenterPoint();
-		
+	public Shape(String name, ArrayList<Point2D> initialPoints){
+		this.name = name;
+		this.centerRelativePoints = initialPoints;
+		setCenterPoint();
 	}
-	
-	public void SetCenterPoint(){
-		Point2D bigX = this.initialPoints.get(0), smallX= this.initialPoints.get(0), bigY= this.initialPoints.get(0), smallY= this.initialPoints.get(0);
-		for(Point2D point:this.initialPoints){
+
+	private void setCenterPoint(){
+		Point2D bigX = this.centerRelativePoints.get(0), smallX= this.centerRelativePoints.get(0), bigY= this.centerRelativePoints.get(0), smallY= this.centerRelativePoints.get(0);
+		for(Point2D point:this.centerRelativePoints){
 			if(point.getX() > bigX.getX())bigX = point;
 			if(point.getX() < smallX.getX())smallX = point;
 			if(point.getY() > bigY.getY())bigY = point;
@@ -30,26 +27,53 @@ public class Shape {
 		mp1 = bigX.midpoint(smallX);
 		mp2 = bigY.midpoint(smallY);
 		Point2D midPoint = mp1.midpoint(mp2);
-		System.out.println(mp1 + "midpoint");
-		initialCenterPoint = new Point2D(Math.floor(midPoint.getX()), Math.floor(midPoint.getY()));
-		
+		DecimalFormat df = new DecimalFormat("#");
+		shapeCenterPoint = new Point2D(Double.valueOf(df.format(Math.floor(midPoint.getX()))), Double.valueOf(df.format(Math.floor(midPoint.getY()))));
 	}
 	
-	public ArrayList<Point2D> setRetalivePoints(){
-		for(Point2D point:this.initialPoints){
-			relativePoints.add(point.subtract(initialCenterPoint));
-			
-			System.out.println(point +""+  initialCenterPoint);
+	public ArrayList<Point2D> setRetalivePoints(Point2D clickedPoint){
+		Point2D upperBound = new Point2D(74,74);
+		Point2D lowerBound = new Point2D(0,0);
+		for(Point2D point:this.centerRelativePoints){
+			Point2D newPoint = point.subtract(this.shapeCenterPoint).add(clickedPoint);
+			if(isBigger(newPoint,upperBound) || isSmaller(newPoint, lowerBound)){
+				if(newPoint.getX()<0){
+					newPoint = new Point2D(75+newPoint.getX(), newPoint.getY());
+				}
+				if(newPoint.getY()<0){
+					newPoint = new Point2D(newPoint.getX(), 75+newPoint.getY());
+				}
+				if(newPoint.getX()>74){
+					newPoint = new Point2D(newPoint.getX()%75, newPoint.getY());
+				}
+				if(newPoint.getY()>74){
+					newPoint = new Point2D(newPoint.getX(), newPoint.getY()%75);
+				}
+			}
+			this.clickRelativePoints.add(newPoint);
 		}
-		return relativePoints;
+		return this.clickRelativePoints;
 	}
 	
-	public ArrayList<Point2D> star(Point2D centerPoint){
-		return relativePoints;
+	public String getName(){
+		return this.name;
 	}
-	
-	
-	
-	
+	private boolean isBigger(Point2D p1, Point2D p2){
+		if(p1.getX() > p2.getX() || p1.getY() > p2.getY()){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	private boolean isSmaller(Point2D p1, Point2D p2){
+		if(p1.getX() < p2.getX() || p1.getY() < p2.getY()){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
 	
 }

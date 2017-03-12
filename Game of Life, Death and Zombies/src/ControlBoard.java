@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
-import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -19,7 +18,7 @@ import javax.swing.event.ChangeListener;
 public class ControlBoard extends JPanel{
 	private static final long serialVersionUID = 404911692099798724L;
 	
-	private String[] shapes={"star","block","beehive","loaf","boat","tub","blinker","toad","beacon"};
+	private String[] shapes={"dot","star","block","beehive","loaf","boat","tub","blinker","toad","beacon"};
 	private JButton resetButton = new JButton("Reset");
 	private JButton nextButton = new JButton("Next");
 	private JButton refreshButton = new JButton("Refresh");
@@ -27,7 +26,6 @@ public class ControlBoard extends JPanel{
 	private JButton startButton = new JButton("Start");
 	private JButton stopButton = new JButton("Stop");
 	private JSlider speedSlider = new JSlider(100, 1000, Main.initialTimerSpeed);
-	private JToggleButton painShapeToggle = new JToggleButton("Toggle Shapes");
 	private JComboBox<String> shapeComboBox = new JComboBox<String>(shapes);
 	private static JLabel generationCount = new JLabel();
 	
@@ -65,7 +63,6 @@ public class ControlBoard extends JPanel{
 		speedSlider.setSnapToTicks(true);
 		speedSlider.setPaintLabels(true);
 		speedSlider.addChangeListener(timerSpeed);
-		painShapeToggle.addActionListener(toggleShape);
 		gameboardControls.add(resetButton);
 		gameboardControls.add(refreshButton);
 		gameboardControls.add(backButton);
@@ -75,7 +72,6 @@ public class ControlBoard extends JPanel{
 		gameboardControls.add(startButton);
 		gameboardControls.add(stopButton);
 		gameboardControls.add(Box.createRigidArea(new Dimension(200,10)));
-		gameboardControls.add(painShapeToggle);
 		
 		generationCount.setText("Generation: "+Main.generationCount);
 		shapeComboBox.addActionListener(selectShape);
@@ -134,18 +130,8 @@ public class ControlBoard extends JPanel{
 			}
 		}
 	};
-	private ActionListener toggleShape = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JToggleButton toggle = (JToggleButton) e.getSource();
-            if (toggle.isSelected()) {
-            	Main.setShapeToggle(true);
-            } else {
-            	Main.setShapeToggle(false);
-            }
-		}
-	};
 	private ActionListener selectShape = new ActionListener() {
+		@SuppressWarnings("unchecked")
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JComboBox<String> toggle = (JComboBox<String>) e.getSource();
@@ -153,7 +139,7 @@ public class ControlBoard extends JPanel{
             
 		}
 	};
-	public void paintGameboardSettings(){
+	public void rePaintGameboardSettings(){
 		gameboardSettings.repaint();
 	}
 	@Override

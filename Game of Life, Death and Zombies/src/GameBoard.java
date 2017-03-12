@@ -2,13 +2,11 @@ import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
-
 import javafx.geometry.Point2D;
 
 public class GameBoard extends JPanel{
@@ -16,77 +14,28 @@ public class GameBoard extends JPanel{
 	
 	static int hGap=1;
 	static int vGap=1;
-	static int columns=50;
-	static int rows=50;
-	private Boolean createRandom;
-	private Boolean shapeToggle;
-	private String selectedShape = "star";
-	static GridLayout cellGrid = new GridLayout(rows,columns,hGap,vGap);
-	static Cell[][] cellArray = new Cell[200][200];
-	private String guideStatusOverride;
+	static int columns=75;
+	static int rows=75;
+	private boolean drawTestShape = false;
+	private boolean createRandom = true;
+	private static GridLayout cellGrid = new GridLayout(rows,columns,hGap,vGap);
 	
-	private MouseAdapter mouseClick = new MouseAdapter() {
-		@Override
-		public void mousePressed(MouseEvent e) {
-			if(shapeToggle){
-				drawShape(e);
-				//insertShape(e);
-			}
-			else{
-				cellSelection(e);
-			}
-		}
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			cellSelection(e);
-		}
-		@Override
-		public void mouseExited(MouseEvent e) {
-			Cell overCell = (Cell) e.getComponent();
-			if(overCell.getStatus() == "guide"){
-				overCell.setStatus(guideStatusOverride);
-				overCell.repaint();
-		    }
-		}
-		@Override
-		public void mouseEntered(MouseEvent e) {
-			if(SwingUtilities.isLeftMouseButton(e)){
-				cellSelection(e);
-			}
-			else{
-				Cell overCell = (Cell) e.getComponent();
-				guideStatusOverride=overCell.getStatus();
-				overCell.setStatus("guide");
-				overCell.repaint();
-			}
-		}
-	};
+	private String selectedShape = "dot";
+	private String statusSelected;
+	private static Cell[][] cellArray = new Cell[100][100];
+	private Shapes shape = new Shapes();
+	private ArrayList<Point2D> relativePoints = new ArrayList<Point2D>();
 	
-	public void drawShape(MouseEvent e){
-		Cell overCell = (Cell) e.getComponent();
-		Shape shape = new Shape();
-		Point2D point = new Point2D(overCell.getXVal(), overCell.getYVal());
-		
-		ArrayList<Point2D> relativePoints = shape.setRetalivePoints();
-		for(Point2D point1:relativePoints){
-			System.out.println(point);
-			int x = (int) point.getX();
-			int y = (int) point.getY();
-			cellArray[x][y].setStatus("zombie");
-			cellArray[x][y].repaint();
-;		}
-	}
 	
 	public GameBoard() {
 		applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		setLayout(cellGrid);
 		setBackground(Color.DARK_GRAY);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		createRandom=true;
-		shapeToggle=false;
+		
 		Random random = new Random();
 		
-        for(int i=0;i<rows;i++){
+		for(int i=0;i<rows;i++){
 			for(int j=0;j<columns;j++){
 				if(createRandom && random.nextInt(10)<2){
 					cellArray[j][i] = new Cell(j,i,random.nextBoolean());
@@ -99,26 +48,10 @@ public class GameBoard extends JPanel{
 				add(cellArray[j][i]);
 			}
 		}
-        
-    }
-	
-	private void cellSelection(MouseEvent e){
-		Cell selectedCell = (Cell) e.getComponent();
-    	if(e.isControlDown() || SwingUtilities.isRightMouseButton(e)){
-    		if(selectedCell.getStatus() != "zombie"){
-    			selectedCell.setStatus("zombie");
-    		}
-    	}
-    	else if(SwingUtilities.isLeftMouseButton(e)){
-    		if(selectedCell.getStatus()=="dead" || selectedCell.getStatus()=="guide"){
-    			selectedCell.setStatus("alive");
-    		}
-    		else{
-    			selectedCell.setStatus("dead");
-    		}
-    	}
-    	setAdyacentNeighborValues(selectedCell.getXVal(),selectedCell.getYVal());
-    	selectedCell.repaint();
+		if(drawTestShape){
+			resetBoard();
+			insertTestShape();
+		}
 	}
 	
 	public void resetBoard(){
@@ -196,131 +129,94 @@ public class GameBoard extends JPanel{
 	}
 	
 	public void insertTestShape(){
+		relativePoints.clear();
 		int middleX = columns/2;
 		int middleY = rows/2;
-		star(middleX, middleY-3);
-		star(middleX, middleY+3);
-		star(middleX-3, middleY);
-		star(middleX+3, middleY);
-		setAllNeighborValues();
-	}
-	public void insertShape(MouseEvent e){
-		Cell selectedCell = (Cell) e.getComponent();
-		int x = selectedCell.getXVal();
-		int y = selectedCell.getYVal();
-		switch (selectedShape) {
-		case "star":
-			star(x,y);
-			break;
-		case "block":
-			block(x,y);
-			break;
-		case "beehive":
-			beehive(x,y);
-			break;
-		case "loaf":
-			loaf(x,y);
-			break;
-		case "boat":
-			boat(x,y);
-			break;
-		case "tub":
-			tub(x,y);
-			break;
-		case "blinker":
-			blinker(x,y);
-			break;
-		case "toad":
-			toad(x,y);
-			break;
-		case "beacon":
-			beacon(x,y);
-			break;
-		default:
-			break;
+		relativePoints =shape.getShape("star", new Point2D(middleX, middleY-3));
+		relativePoints =shape.getShape("star", new Point2D(middleX, middleY+3));
+		relativePoints =shape.getShape("star", new Point2D(middleX-3, middleY));
+		relativePoints =shape.getShape("star", new Point2D(middleX+3, middleY));
+		for(Point2D point1:relativePoints){
+			int x = (int) point1.getX();
+			int y = (int) point1.getY();
+			cellArray[x][y].setStatus("alive");
 		}
 		setAllNeighborValues();
-		repaint();
 	}
 	
-	private void star(int x, int y){
-		paintCell(x, y-1, "alive");
-		paintCell(x, y, "alive");
-		paintCell(x, y+1, "alive");
-		paintCell(x-1, y, "alive");
-		paintCell(x+1, y, "alive");
-	}
-	private void block(int x, int y){
-		paintCell(x, y, "alive");
-		paintCell(x, y+1, "alive");
-		paintCell(x+1, y, "alive");
-		paintCell(x+1, y+1, "alive");
-	}
-	private void beehive(int x, int y){
-		paintCell(x, y-1, "alive");
-		paintCell(x+1, y-1, "alive");
-		paintCell(x-1, y, "alive");
-		paintCell(x+2, y, "alive");
-		paintCell(x, y+1, "alive");
-		paintCell(x+1, y+1, "alive");
-	}
-	private void loaf(int x, int y){
-		paintCell(x, y-1, "alive");
-		paintCell(x+1, y-1, "alive");
-		paintCell(x-1, y, "alive");
-		paintCell(x+2, y, "alive");
-		paintCell(x, y+1, "alive");
-		paintCell(x+2, y+1, "alive");
-		paintCell(x+1, y+2, "alive");
-	}
-	private void boat(int x, int y){
-		cellArray[x-1][y-1].setStatus("alive");
-		cellArray[x][y-1].setStatus("alive");
-		cellArray[x][y+1].setStatus("alive");
-		cellArray[x-1][y].setStatus("alive");
-		cellArray[x+1][y].setStatus("alive");
-	}
-	private void tub(int x, int y){
-		cellArray[x][y-1].setStatus("alive");
-		cellArray[x][y+1].setStatus("alive");
-		cellArray[x-1][y].setStatus("alive");
-		cellArray[x+1][y].setStatus("alive");
-	}
-	private void blinker(int x, int y){
-		cellArray[x-1][y].setStatus("alive");
-		cellArray[x][y].setStatus("alive");
-		cellArray[x+1][y].setStatus("alive");
-	}
-	private void toad(int x, int y){
-		cellArray[x-1][y].setStatus("alive");
-		cellArray[x][y].setStatus("alive");
-		cellArray[x+1][y].setStatus("alive");
-		cellArray[x][y-1].setStatus("alive");
-		cellArray[x+1][y-1].setStatus("alive");
-		cellArray[x+2][y-1].setStatus("alive");
-	}
-	private void beacon(int x, int y){
-		cellArray[x-1][y-1].setStatus("alive");
-		cellArray[x][y-1].setStatus("alive");
-		cellArray[x-1][y].setStatus("alive");
-		cellArray[x][y].setStatus("alive");
-		cellArray[x+1][y+1].setStatus("alive");
-		cellArray[x+2][y+1].setStatus("alive");
-		cellArray[x+1][y+2].setStatus("alive");
-		cellArray[x+2][y+2].setStatus("alive");
-	}
-	private void paintCell(int x, int y,String status){
-		cellArray[x][y].setStatus(status);
-	}
-	
-	public void setShapeToggle(Boolean state){
-		this.shapeToggle=state;
+	public void drawShape(MouseEvent e, String status){
+		Cell overCell = (Cell) e.getComponent();
+		Point2D clickedPoint = new Point2D(overCell.getXVal(), overCell.getYVal());
+		relativePoints.clear();
+		relativePoints =shape.getShape(selectedShape, clickedPoint);
+		for(Point2D point1:relativePoints){
+			int x = (int) point1.getX();
+			int y = (int) point1.getY();
+			if(status == "guide"){
+				cellArray[x][y].setGuideStatusOverride(cellArray[x][y].getStatus());
+				cellArray[x][y].setStatus(status);
+			}
+			else if(status == "override"){
+				cellArray[x][y].setStatus(cellArray[x][y].getGuideStatusOverride());
+			}
+			else{
+				cellArray[x][y].setStatus(status);
+				cellArray[x][y].setGuideStatusOverride(cellArray[x][y].getStatus());
+			}
+			cellArray[x][y].repaint();
+			setAdyacentNeighborValues(x,y);
+		}
 	}
 	
 	public void setSelectedShape(String shape){
 		selectedShape = shape;
 	}
     
+	private MouseAdapter mouseClick = new MouseAdapter() {
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if(e.isControlDown() || SwingUtilities.isRightMouseButton(e)){
+				drawShape(e,"zombie");
+				statusSelected = "zombie";
+			}
+			else if(e.isAltDown()){
+				drawShape(e,"dead");
+				statusSelected = "dead";
+			}
+			else{
+				drawShape(e,"alive");
+				statusSelected = "alive";
+			}
+		}
+		@Override
+		public void mouseExited(MouseEvent e) {
+			Cell overCell = (Cell) e.getComponent();
+			if(overCell.getStatus() == "guide"){
+				drawShape(e,"override");
+		    }
+			else{
+				try {
+					drawShape(e,"override");
+				} catch (Exception e2) {
+					System.out.println(e2 +" "+ ((Cell) e.getComponent()).getYVal());
+				}
+				
+			}
+		}
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			if(SwingUtilities.isLeftMouseButton(e)){
+				drawShape(e, statusSelected);
+			}
+			else{
+				Cell overCell = (Cell) e.getComponent();
+				if(overCell.getStatus() != "guide"){
+					drawShape(e, "guide");
+				}
+			}	
+		}
+	};
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);

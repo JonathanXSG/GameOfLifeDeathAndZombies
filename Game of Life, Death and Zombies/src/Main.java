@@ -11,9 +11,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-
 public class Main {
-
+	
 	static JFrame mainFrame = new JFrame("A Game of Life, Death and Zombies");
 	static JPanel mainPanel = new JPanel(new BorderLayout());	    
 	static GameBoard gameBoard = new GameBoard();
@@ -86,14 +85,10 @@ public class Main {
 	static void setTimerSpeed(int speed){
 		timer.setDelay(speed);
 	}
-	static void setShapeToggle(Boolean state){
-		gameBoard.setShapeToggle(state);
-	}
 	static void setSelectedShape(String shape){
 		gameBoard.setSelectedShape(shape);
 	}
 	public static void repaintGameboardSettings(){
-		controlBoard.paintGameboardSettings();
+		controlBoard.rePaintGameboardSettings();
 	}
-
 }
