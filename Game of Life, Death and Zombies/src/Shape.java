@@ -38,16 +38,16 @@ public class Shape {
 			Point2D newPoint = point.subtract(this.shapeCenterPoint).add(clickedPoint);
 			if(isBigger(newPoint,upperBound) || isSmaller(newPoint, lowerBound)){
 				if(newPoint.getX()<0){
-					newPoint = new Point2D(75+newPoint.getX(), newPoint.getY());
+					newPoint = new Point2D(GameBoard.columns+newPoint.getX(), newPoint.getY());
 				}
 				if(newPoint.getY()<0){
-					newPoint = new Point2D(newPoint.getX(), 75+newPoint.getY());
+					newPoint = new Point2D(newPoint.getX(), GameBoard.rows+newPoint.getY());
 				}
 				if(newPoint.getX()>74){
-					newPoint = new Point2D(newPoint.getX()%75, newPoint.getY());
+					newPoint = new Point2D(newPoint.getX()%GameBoard.columns, newPoint.getY());
 				}
 				if(newPoint.getY()>74){
-					newPoint = new Point2D(newPoint.getX(), newPoint.getY()%75);
+					newPoint = new Point2D(newPoint.getX(), newPoint.getY()%GameBoard.rows);
 				}
 			}
 			this.clickRelativePoints.add(newPoint);

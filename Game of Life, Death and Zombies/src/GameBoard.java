@@ -14,15 +14,15 @@ public class GameBoard extends JPanel{
 	
 	static int hGap=1;
 	static int vGap=1;
-	static int columns=75;
-	static int rows=75;
+	static int columns=150;
+	static int rows=100;
 	private boolean drawTestShape = false;
 	private boolean createRandom = true;
 	private static GridLayout cellGrid = new GridLayout(rows,columns,hGap,vGap);
 	
 	private String selectedShape = "dot";
 	private String statusSelected;
-	private static Cell[][] cellArray = new Cell[100][100];
+	private static Cell[][] cellArray = new Cell[columns][rows];
 	private Shapes shape = new Shapes();
 	private ArrayList<Point2D> relativePoints = new ArrayList<Point2D>();
 	
@@ -38,10 +38,10 @@ public class GameBoard extends JPanel{
 		for(int i=0;i<rows;i++){
 			for(int j=0;j<columns;j++){
 				if(createRandom && random.nextInt(10)<2){
-					cellArray[j][i] = new Cell(j,i,random.nextBoolean());
+					cellArray[j][i] = new Cell(j,i,random.nextBoolean(),1000/rows);
 				}
 				else{
-					cellArray[j][i] = new Cell(j,i,"dead");
+					cellArray[j][i] = new Cell(j,i,"dead",1000/rows);
 				}
 				cellArray[j][i].addMouseListener(mouseClick);
 				cellArray[j][i].addMouseMotionListener(mouseClick);
@@ -55,8 +55,8 @@ public class GameBoard extends JPanel{
 	}
 	
 	public void resetBoard(){
-		for(int i=0;i<rows;i++){
-			for(int j=0;j<columns;j++){
+		for(int i=0;i<columns;i++){
+			for(int j=0;j<rows;j++){
 				cellArray[i][j].setStatus("dead");
 			}
 		}
@@ -82,7 +82,7 @@ public class GameBoard extends JPanel{
 		int smallY = y - 1;
 		if(smallY < 0) smallY = rows - 1;
 		int bigX = (x + 1) % columns;
-		int bigY = (y + 1) % columns;
+		int bigY = (y + 1) % rows;
 		calcNeighbors(smallX,smallY);
 		calcNeighbors(smallX,y);
 		calcNeighbors(smallX,bigY);
@@ -99,7 +99,7 @@ public class GameBoard extends JPanel{
 		int smallY = y - 1;
 		if(smallY < 0) smallY = rows - 1;
 		int bigX = (x + 1) % columns;
-		int bigY = (y + 1) % columns;
+		int bigY = (y + 1) % rows;
 		int neighbors = 0;
 		if(cellArray[smallX] [smallY].isAlive()) neighbors++;
 		if(cellArray[smallX] [y].isAlive()) neighbors++;
@@ -221,7 +221,6 @@ public class GameBoard extends JPanel{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
     }
-
 
 	
 }

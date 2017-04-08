@@ -47,9 +47,9 @@ public class Main {
 				menuItem.getAccessibleContext();
 				file.add(menuItem);
 
-				mainFrame.setJMenuBar(menuBar);
-				mainPanel.add(gameBoard,BorderLayout.LINE_START);
-				mainPanel.add(controlBoard,BorderLayout.LINE_END);
+				//mainFrame.setJMenuBar(menuBar);
+				mainPanel.add(gameBoard,BorderLayout.WEST);
+				mainPanel.add(controlBoard,BorderLayout.EAST);
 				mainFrame.getContentPane().add(mainPanel);
 
 				mainFrame.pack();

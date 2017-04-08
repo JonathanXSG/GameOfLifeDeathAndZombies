@@ -1,6 +1,5 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,7 +24,7 @@ public class ControlBoard extends JPanel{
 	private JButton backButton = new JButton("Back");
 	private JButton startButton = new JButton("Start");
 	private JButton stopButton = new JButton("Stop");
-	private JSlider speedSlider = new JSlider(100, 1000, Main.initialTimerSpeed);
+	private JSlider speedSlider = new JSlider(50, 950, Main.initialTimerSpeed);
 	private JComboBox<String> shapeComboBox = new JComboBox<String>(shapes);
 	private static JLabel generationCount = new JLabel();
 	
@@ -33,14 +32,14 @@ public class ControlBoard extends JPanel{
 		private static final long serialVersionUID = 1056210011727406326L;
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(200, 250);
+			return new Dimension(200, 500);
 		}
 	};
 	private static JPanel gameboardSettings = new JPanel(){
 		private static final long serialVersionUID = -5195869109910804768L;
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(200, 250);
+			return new Dimension(200, 500);
 		}
 		@Override
 		public void paintComponent(Graphics g) {
@@ -59,7 +58,7 @@ public class ControlBoard extends JPanel{
 		stopButton.addActionListener(stop);
 		speedSlider.setPaintTicks(true);
 		speedSlider.setMinorTickSpacing(150);
-		speedSlider.setMajorTickSpacing(150);
+		speedSlider.setMajorTickSpacing(300);
 		speedSlider.setSnapToTicks(true);
 		speedSlider.setPaintLabels(true);
 		speedSlider.addChangeListener(timerSpeed);
@@ -82,6 +81,7 @@ public class ControlBoard extends JPanel{
 		add(gameboardControls,BorderLayout.PAGE_START);
 		add(new JSeparator(SwingConstants.HORIZONTAL));
 		add(gameboardSettings,BorderLayout.PAGE_END);
+		
 	}
 	
 	private ActionListener reset = new ActionListener() {
@@ -142,10 +142,10 @@ public class ControlBoard extends JPanel{
 	public void rePaintGameboardSettings(){
 		gameboardSettings.repaint();
 	}
-	@Override
-	public Dimension getPreferredSize() {
-		return new Dimension(200, Frame.HEIGHT);
-	}
+//	@Override
+//	public Dimension getPreferredSize() {
+//		return new Dimension(200, Frame.HEIGHT);
+//	}
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);

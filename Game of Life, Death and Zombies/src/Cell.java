@@ -12,20 +12,21 @@ public class Cell extends JComponent{
 	private int neighbors;
 	private int x;
 	private int y;
-	private int height = 10;
-	private int width = 10;
+	private int size = 10;
 	private Boolean state = false;
 	
-	public Cell(int x, int y, String status){
+	public Cell(int x, int y, String status, int size){
 		this.x=x;
 		this.y=y;
 		this.status=status;
+		this.size=size;
 		setToolTipText("X: "+this.getXVal()+" , Y: "+this.getYVal());
 	}
-	public Cell(int x, int y, Boolean alive){
+	public Cell(int x, int y, Boolean alive, int size){
 		this.x=x;
 		this.y=y;
 		this.state=alive;
+		this.size = size;
 		if(this.getState()){
 			this.status="alive";
 		}
@@ -52,13 +53,13 @@ public class Cell extends JComponent{
 		else{
 			g2.setColor(Color.RED);
 		}
-		g2.fillRect(0, 0, width, height);;
+		g2.fillRect(0, 0, size, size);;
 		setToolTipText("X: "+this.getXVal()+" , Y: "+this.getYVal() + " , N: " + this.getNeighbors() + "  "+ this.status);
 	}
 	
 	@Override
 	public Dimension getPreferredSize() {
-		  return new Dimension(width, height);
+		  return new Dimension(size, size);
 	}
 	@Override
 	public void paintComponent(Graphics g){
