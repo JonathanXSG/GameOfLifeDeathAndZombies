@@ -10,6 +10,7 @@ public class Cell extends JComponent{
 	private String status;
 	private String guideStatusOverride = "dead";
 	private int neighbors;
+	private int zombieNeighbors;
 	private int x;
 	private int y;
 	private int size = 10;
@@ -69,11 +70,23 @@ public class Cell extends JComponent{
 	public Boolean isAlive(){
 		return this.getState();
 	}
+	public Boolean isZombie(){
+		if(this.status.equals("zombie")){
+			return true;
+		}
+		return false;
+	}
 	public int getNeighbors(){
 		return this.neighbors;
 	}
 	public void setNeighbors(int neighbors){
 		this.neighbors=neighbors;
+	}
+	public int getZombieNeighbors(){
+		return this.zombieNeighbors;
+	}
+	public void setZombieNeighbors(int zombieNeighbors){
+		this.zombieNeighbors=zombieNeighbors;
 	}
 	public void setStatus(String status){
 		this.status=status;
